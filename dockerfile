@@ -2,7 +2,7 @@
 FROM alpine:latest
 
 # Install necessary packages
-RUN apk --no-cache add samba mdadm rclone
+RUN apk --no-cache add samba mdadm rclone python3 py3-pip
 
 # Configure RAID
 # Replace /dev/sdX with the actual device names for your RAID setup
@@ -32,8 +32,16 @@ RUN echo '[sync]' >> /root/.config/rclone/rclone.conf \
 # Add crontab jobs
 RUN echo '0 * * * * rclone sync /mnt/raid sync:' >> /var/spool/cron/crontabs/root
 
-# Expose the Samba port
-EXPOSE 445
+# Install Python dependencies
+COPY requirements.txt /app/requirements.txt
+RUN pip3 install --no-cache-dir -r /app/requirements.txt
 
-# Start Samba and cron services
-CMD ["sh", "-c", "nmbd --foreground --no-process-group && smbd --foreground --no-process-group && crond -f"]
+# Copy the web server code
+COPY python/web_service.py /app/web_service.py
+
+# Expose the Samba and web server ports
+EXPOSE 445 8000
+
+# Start Samba, cron, and the web server
+CMD ["sh", "-c", "nmbd --foreground --no-process-group && smbd --foreground --no-process-group && crond -f & python3 /app/web_service.py"]
+
