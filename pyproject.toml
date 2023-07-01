@@ -1,0 +1,14 @@
+[tool.poetry]
+name = "nas"
+version = "0.1.0"
+description = "Network Area Storage with Samba Share"
+authors = ["Mitchell Thompkins <mitchell.thompkins@gmail.com>"]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[dependencies]
+flask = "^2.0.1"
+psutil = "^5.8.0"
+

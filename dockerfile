@@ -2,7 +2,7 @@
 FROM alpine:latest
 
 # Install necessary packages
-RUN apk --no-cache add samba mdadm rclone python3 py3-pip
+RUN apk --no-cache add samba mdadm rclone python3 py3-pip curl
 
 # Configure RAID
 # Replace /dev/sdX with the actual device names for your RAID setup
@@ -29,19 +29,25 @@ RUN echo '[sync]' >> /root/.config/rclone/rclone.conf \
     && echo 'type = <remote>' >> /root/.config/rclone/rclone.conf \
     && echo 'env_auth = false' >> /root/.config/rclone/rclone.conf
 
-# Add crontab jobs
-RUN echo '0 * * * * rclone sync /mnt/raid sync:' >> /var/spool/cron/crontabs/root
+# Install Poetry
+RUN curl -sSL https://install.python-poetry.org | python3 -
 
-# Install Python dependencies
-COPY requirements.txt /app/requirements.txt
-RUN pip3 install --no-cache-dir -r /app/requirements.txt
+# Set the working directory
+WORKDIR /app
+
+# Copy the poetry files
+COPY pyproject.toml poetry.lock /app/
+
+# Install project dependencies
+RUN poetry config virtualenvs.create false \
+    && poetry install --no-dev --no-interaction --no-ansi
 
 # Copy the web server code
-COPY python/web_service.py /app/web_service.py
+COPY src/nas/web_server.py /app/web_server.py
 
 # Expose the Samba and web server ports
 EXPOSE 445 8000
 
 # Start Samba, cron, and the web server
-CMD ["sh", "-c", "nmbd --foreground --no-process-group && smbd --foreground --no-process-group && crond -f & python3 /app/web_service.py"]
+CMD ["sh", "-c", "nmbd --foreground --no-process-group && smbd --foreground --no-process-group && crond -f & poetry run python3 /app/web_server.py"]
 
