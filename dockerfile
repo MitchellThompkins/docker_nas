@@ -6,13 +6,13 @@ RUN apk --no-cache add samba mdadm rclone python3 py3-pip curl
 
 # Configure RAID
 # Replace /dev/sdX with the actual device names for your RAID setup
-RUN mdadm --create --verbose /dev/md0 --level=raid1 --raid-devices=2 /dev/sdX /dev/sdY \
-    && echo 'DEVICE /dev/sdX /dev/sdY' > /etc/mdadm.conf \
-    && mdadm --detail --scan >> /etc/mdadm.conf \
-    && mkfs.ext4 /dev/md0 \
-    && echo '/dev/md0 /mnt/raid ext4 defaults 0 0' >> /etc/fstab \
-    && mkdir /mnt/raid \
-    && mount -a
+#RUN mdadm --create --verbose /dev/md0 --level=raid1 --raid-devices=2 /dev/sdX /dev/sdY \
+#    && echo 'DEVICE /dev/sdX /dev/sdY' > /etc/mdadm.conf \
+#    && mdadm --detail --scan >> /etc/mdadm.conf \
+#    && mkfs.ext4 /dev/md0 \
+#    && echo '/dev/md0 /mnt/raid ext4 defaults 0 0' >> /etc/fstab \
+#    && mkdir /mnt/raid \
+#    && mount -a
 
 # Configure Samba
 RUN echo '[samba_share]' >> /etc/samba/smb.conf \

@@ -1,0 +1,15 @@
+version: '3'
+services:
+  docker-nas:
+    image: my_storage_image
+    volumes:
+      - /path/to/raid/config:/path/to/raid/config
+      - /path/to/smb/config:/path/to/smb/config
+    restart: unless-stopped
+    privileged: true
+    network_mode: host
+    ports:
+      - 3000:1337
+    environment:
+      - BASE_URL=http://pidev.lan:3000
+      - TRUST_PROXY=0

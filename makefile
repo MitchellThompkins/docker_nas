@@ -5,3 +5,7 @@ build:
 .PHONY: run
 run:
 	docker run -d --name nas-container -p 445:445 -v /path/to/local/disks:/mnt/raid nas-image
+
+.PHONY: docker-up:
+docker-up:
+	docker-compose up -d
